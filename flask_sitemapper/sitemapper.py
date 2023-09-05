@@ -48,7 +48,7 @@ class Sitemapper:
 
     def include(
         self,
-        lastmod: Union[str, datetime] = None,
+        lastmod: Union[str, datetime, list] = None,
         changefreq: str = None,
         priority: Union[str, int, float] = None,
         url_variables: dict = {},
@@ -82,7 +82,7 @@ class Sitemapper:
     def add_endpoint(
         self,
         view_func: Union[Callable, str],
-        lastmod: Union[str, datetime] = None,
+        lastmod: Union[str, datetime, list] = None,
         changefreq: str = None,
         priority: Union[str, int, float] = None,
         url_variables: dict = {},
@@ -104,9 +104,16 @@ class Sitemapper:
         # if url variables are provided (for dynamic routes)
         if url_variables:
             # create a URL object for each set of url variables and append it to self.urls
-            for i in [dict(zip(url_variables, j)) for j in zip(*url_variables.values())]:
-                url = URL(endpoint, self.scheme, lastmod, changefreq, priority, i)
-                self.urls.append(url)
+            if isinstance(lastmod, list):
+                c = 0
+                for i in [dict(zip(url_variables, j)) for j in zip(*url_variables.values())]:
+                    url = URL(endpoint, self.scheme, lastmod[c], changefreq, priority, i)
+                    self.urls.append(url)
+                    c+=1
+            else :
+                for i in [dict(zip(url_variables, j)) for j in zip(*url_variables.values())]:
+                    url = URL(endpoint, self.scheme, lastmod, changefreq, priority, i)
+                    self.urls.append(url)
         else:
             # create a URL object without url variables and append it to self.urls
             url = URL(endpoint, self.scheme, lastmod, changefreq, priority)
